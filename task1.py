@@ -8,6 +8,8 @@ Created on Mon Sep 15 17:00:11 2014
 from sympy import *
 
 def upper_positive(p):
+    if p.LC() < 0:
+        p = p * (-1)
     coeffs = p.all_coeffs()
     i = 0
     m = 0
@@ -83,9 +85,9 @@ def newtone(x_0, p):
         b = p.diff(x).subs(x, x_k)
         c = a / b
         x_k_1 = x_k - p.subs(x, x_k) / p.diff(x).subs(x, x_k)      
-        print "{}    |    {:+.13f}    |    {}".format(k, float(x_k), p.subs(x, x_k))
+        print "{}    |    {:+.13f}    |    {}".format(k, float(x_k), Float(p.subs(x, x_k)))
         if abs(x_k_1 - x_k) < 0.00001:
-            return
+            return x_k_1
         x_k = x_k_1
         k += 1
 
@@ -96,18 +98,25 @@ p1 = poly(x**3 + 3*x**2 - 3)
 
 p2 = poly(2042*x**12 - 6144*x**10 + 6912*x**8 - 3524*x**6 + 840*x**4 - 72*x**2 + 1)
 
-p3 = series(x - sin(x), x, 0, 6)
+p3 = poly(x - Rational(1, 4) - series(sin(x), x, 0, 4).removeO())p
      
 def newtone_solve(p):
     k_1 = upper_positive(p)
     k_2 = lower_positive(p)
     k_3 = lower_negative(p)
     k_4 = upper_negative(p)
+    print "k_1 = {:.4f}".format(float(k_1))
+    print "k_2 = {:.4f}".format(float(k_2))
+    print "k_3 = {:.4f}".format(float(k_3))
+    print "k_4 = {:.4f}".format(float(k_4))
     intrvs = find_intervals(p, k_1, k_2) + find_intervals(p, k_3, k_4)
+    print "intervals: "
+    for intrv in intrvs:
+        print "({:.2f}, {:.2f})".format(float(intrv[0]), float(intrv[1]))
     for intrv in intrvs:
         x_0 = find_init_approx(p, intrv)
         print "-------------------------------------------------------------------------------"
         newtone(x_0, p)
 
 
-newtone_solve(p2)
+newtone_solve(p3)
