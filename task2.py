@@ -1,7 +1,9 @@
+from sys import stdin
+from sys import exit
 from sympy import *
 
 def f_range(a, b, d):
-    while a < b:
+    while a <= b:
         yield a
         a += d
 
@@ -67,19 +69,22 @@ def newtone_solve(f, g, eps = 10**(-5)):
         quit_flag = False
         print "  k  |      x_k      |      y_k      |     f(x_k)    |     g(x_k)   "
         print "----------------------------------------------------------------------------"
-        for k in range(1, 10):
+        for k in range(0, 9):
             print "  {}  | {:+.9f}  | {:+.9f}  | {:+.9f}  | {:+.9f} ".format(k, float(x_k), float(y_k),
                                                                              float(f.subs([(x, x_k), (y, y_k)])),
                                                                              float(g.subs([(x, x_k), (y, y_k)])))
             if (quit_flag):
-                return x_k, y_k
+                break
             x_k_1, y_k_1 = newtone_step(f, g, x_k, y_k)
             if abs(x_k_1 - x_k) < eps and abs(y_k_1 - y_k < eps):
                 quit_flag = True
             x_k = x_k_1
             y_k = y_k_1
-        res.append((x_k, y_k))
         print "----------------------------------------------------------------------------"
+        res.append((x_k, y_k))
+
+        if len(res) >= 2:
+            return res
     return res
 
 
@@ -89,7 +94,30 @@ f = cos(x**2 + y**2) - x + y - a
 g = (x + y - 2)**2 / k + (x - y)**2 / (k - 0.1) - 1
 
 if __name__ == "__main__":
-    sub = [(a, 0), (k, 0.4)]
-    newtone_solve(f.subs(sub), g.subs(sub))
+    for ai in f_range(0.0, 0.5, 0.1):
+        for ki in f_range(0.4, 1.2, 0.2):
+            print "a = {:.1f}".format(ai)
+            print "k = {:.1f}".format(ki)
+            sub = [(a, ai), (k, ki)]
+            newtone_solve(f.subs(sub), g.subs(sub))
+            print "----------------------------------------------------------------------------"
+
+    while True:
+        print "Enter 'a' and 'k' for plot (or print 'q' to exit):"
+        line = stdin.readline()
+        if line.strip() == "q":
+            exit()
+        words = line.split()
+
+        ai = float(words[0])
+        ki = float(words[1])
+        sub = [(a, ai), (k, ki)]
+
+        plotting.plot_implicit(Or(Eq(f.subs(sub)), Eq(g.subs(sub))))
+        
+
+
+
+
 
 #print filter_near([(0, 1), (1, 1), (0, 7)], 2)
