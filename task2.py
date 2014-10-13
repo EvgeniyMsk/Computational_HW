@@ -1,6 +1,7 @@
 from sys import stdin
 from sys import exit
 from sympy import *
+from sympy.matrices import Matrix
 
 def f_range(a, b, d):
     while a <= b:
@@ -52,9 +53,9 @@ def newtone_step(f, g, xi, yi):
     fy =  dfdy.subs(sub)
     gx =  dgdx.subs(sub)
     gy =  dgdy.subs(sub)
-    detx = matrices.Matrix([[mf, fy], [mg, gy]]).det()
-    dety = matrices.Matrix([[fx, mf], [gx, mg]]).det()
-    det  = matrices.Matrix([[fx, fy], [gx, gy]]).det()
+    detx = Matrix([[mf, fy], [mg, gy]]).det()
+    dety = Matrix([[fx, mf], [gx, mg]]).det()
+    det  = Matrix([[fx, fy], [gx, gy]]).det()
 
     xj = xi + float(detx) / det
     yj = yi + float(dety) / det
@@ -114,10 +115,8 @@ if __name__ == "__main__":
         sub = [(a, ai), (k, ki)]
 
         plotting.plot_implicit(Or(Eq(f.subs(sub)), Eq(g.subs(sub))))
-        
 
 
-
-
-
-#print filter_near([(0, 1), (1, 1), (0, 7)], 2)
+# Examples:
+# a = 0; k = 0.4 - intersect
+# a = 2; k = 1.2 - not intersect
