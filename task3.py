@@ -113,6 +113,7 @@ if __name__ == "__main__":
 
 
     ind = 4
+
     sub1 = [(y0, diffs[0][ind]),
             (y1, diffs[1][ind]),
             (y2, diffs[2][ind]),
@@ -186,16 +187,17 @@ if __name__ == "__main__":
             (y3, diffs[3][ind - 1]),
             (y4, diffs[4][ind - 2])]
     intrpr4 = intrp3
-    p_t = ((intrpr4 - y - t*y1) / y1).subs(sub4)
+    p_t = ((y - intrpr4) / y1 + t).subs(sub4)
 
     tk   = 0
     tk_1 = 0
     eps = 1e-5
     for k in range(0, 20):
         tk_1 = p_t.subs(t, tk)
-        print " k  |       tk       |       p(tk)    "
+        x = h * tk + xs[ind]
+        print " k   |       tk       |       p(tk)    |     x*    "
         print "---------------------------------------------------------------------------"
-        print " {}   |  {:+.9f}  |  {:+.9f}".format(k, float(tk), float(tk_1))
+        print " {}   |  {:+.9f}  |  {:+.8f}  |  {:+.9f}  ".format(k, float(tk), float(tk_1), float(x))
         print "---------------------------------------------------------------------------"
         if abs(tk_1 - tk) < eps:
             break
