@@ -40,11 +40,11 @@ def trap_integral(func, seg, n):
 def simpson_integral(func, seg, n):
     h = (seg[1] - seg[0]) / n
 
-    intgr = h/3 * (func.subs(x, seg[0]) + func.subs(x, seg[1]))
-    for k in range(1, n/2 + 1):
-        intgr += h/3 * 4 * func.subs(x, seg[0] + (2*k-1)*h)
-    for k in range(1, n/2):
-        intgr += h/3 * 2 * func.subs(x, seg[0] + (2*k)*h)
+    intgr = h/6 * (func.subs(x, seg[0]) + func.subs(x, seg[1]))
+    for k in range(1, n+1):
+        intgr += h/6 * 4 * func.subs(x, seg[0] + (2*k-1)*h/2)
+    for k in range(1, n):
+        intgr += h/6 * 2 * func.subs(x, seg[0] + k*h)
 
     fdiff = func.diff(x, 4)
     fdiffm = max(fdiff.subs(x, seg[0]), fdiff.subs(x, seg[1]))
