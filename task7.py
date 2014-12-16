@@ -75,7 +75,7 @@ def adams_method(f, x0, y0, xn, n):
     + indent + "  d2h  " + indent + "|" \
     + indent + "  d3h  " + indent + "|" \
     + indent + "  d4h  " + indent + "|"
-    print "-" * 120
+    print "-" * 112
 
     for p in ps4:
         line = list(p) + diffs
@@ -107,26 +107,42 @@ def adams_method(f, x0, y0, xn, n):
 
     return ps
 
+def calc_err(f, ps, h):
+    # M coeffs
+    M1 = Rational(3, 5)
+    M2 = Rational(7, 25)
+    M3 = Rational(5, 4)
+    M4 = M2 + M1 * M3
+
+    AS = []
+    for (xk, yk) in ps:
+        A = (M4 / 2*M3) * h * f.subs([(x, xk), (y, yk)]) * exp(M3 * (x0 - xk))
+        AS.append(A)
+    return AS
 
 
-def print_table(points, y_pr):
+def print_table(points, y_pr, err):
     indent = " " * 4
     print \
       indent +     " k "    + indent + "|" \
     + indent + " xk  "       + indent + "|" \
     + indent + "    yk     " + indent + "|" \
-    + indent + "  yk prec  " + indent + "|"
-    print "-" * 100
+    + indent + "  yk prec  " + indent + "|" \
+    + indent + "yk - yk_pr " + indent + "|" \
+    + indent + "     A     " + indent + "|"
+    print "-" * 106
 
     n = len(points)
-    for (k, (xk, yk)) in zip(range(0, n), points):
+    for (k, (xk, yk), errk) in zip(range(0, n), points, err):
         print \
         indent   + "{:<3}".format(k)             + indent + "|"     \
         + indent + "{:+.2f}".format(float(xk))   + indent + "|"     \
         + indent + "{:+.8f}".format(float(yk))   + indent + "|"     \
-        + indent + "{:+.8f}".format(float(y_pr(xk))) + indent + "|"
+        + indent + "{:+.8f}".format(float(y_pr(xk))) + indent + "|" \
+        + indent + "{:+.8f}".format(float(abs(yk - y_pr(xk))))   + indent + "|"     \
+        + indent + "{:+.8f}".format(float(errk)) + indent + "|"
 
-    print "-" * 100
+    print "-" * 106
 
 
 if __name__ == "__main__":
@@ -144,31 +160,36 @@ if __name__ == "__main__":
     print "Euler method h = 0.1"
     print ""
     euler_res1 = euler_method(f, x0, y0, xn, n)
-    print_table(euler_res1, y_pr)
+    err = calc_err(f, euler_res1, 0.1)
+    print_table(euler_res1, y_pr, err)
     print ""
 
     print "Euler method h = 0.05"
     print ""
     euler_res2 = euler_method(f, x0, y0, xn, 2*n)
-    print_table(euler_res2, y_pr)
+    err = calc_err(f, euler_res2, 0.05)
+    print_table(euler_res2, y_pr, err)
     print ""
 
     print "Euler method h = 0.2"
     print ""
     euler_res3 = euler_method(f, x0, y0, xn, n/2)
-    print_table(euler_res3, y_pr)
+    err = calc_err(f, euler_res3, 0.2)
+    print_table(euler_res3, y_pr, err)
     print ""
 
     print "Runge-Kutta method"
     print ""
-    runge_kutt_res  = runge_kutt_method(f, x0, y0, xn, n)
-    print_table(runge_kutt_res, y_pr)
+    runge_kutt_res = runge_kutt_method(f, x0, y0, xn, n)
+    err = calc_err(f, runge_kutt_res, 0.1)
+    print_table(runge_kutt_res, y_pr, err)
     print ""
 
     print "Adams method"
     print ""
-    adams_res       = adams_method(f, x0, y0, xn, n)
-    print_table(adams_res, y_pr)
+    adams_res = adams_method(f, x0, y0, xn, n)
+    err = calc_err(f, adams_res, 0.1)
+    print_table(adams_res, y_pr, err)
 
 
     xs = [x for (x, y) in euler_res1]
