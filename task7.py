@@ -16,22 +16,29 @@ def f_range(a, b, d):
         yield a
         a += d
 
-def differences(f, h, x0, y0):
-    hs = [h * f.subs([(x, x0), (y, y0)])]
-    xi = x0
-    yi = y0
-    while True:
-        yield hs
-        xi = xi + h
-        yi = yield
-        hi = h * f.subs([(x, xi), (y, yi)])
-        hsi = [hi]
-        #print hs
-        for hk in hs:
-            hi = hi - hk
-            hsi.append(hi)
-        hs = hsi
+# def differences(f, h, x0, y0):
+#     hs = [h * f.subs([(x, x0), (y, y0)])]
+#     xi = x0
+#     yi = y0
+#     while True:
+#         yield hs
+#         xi = xi + h
+#         yi = yield
+#         hi = h * f.subs([(x, xi), (y, yi)])
+#         hsi = [hi]
+#         #print hs
+#         for hk in hs:
+#             hi = hi - hk
+#             hsi.append(hi)
+#         hs = hsi
 
+def differences(f, h, xi, yi, prev):
+    et = h * f.subs([(x, xi), (y, yi)])
+    ets = [et]
+    for pr in prev:
+        et = et - pr
+        ets.append(et)
+    return ets
 
 def euler_method(f, x0, y0, xn, n):
     h = float(xn - x0) / n
@@ -61,9 +68,12 @@ def runge_kutt_method(f, x0, y0, xn, n):
 def adams_method(f, x0, y0, xn, n):
     h = float(xn - x0) / n
     ps4 = runge_kutt_method(f, x0, y0, x0 + 4*h, 4)
-    gen = differences(f, h, x0, y0)
-    diffs = gen.next()
-    idiff = []
+
+    diffs = []
+    diff = []
+    for p in ps4:
+        diff = differences(f, h, p[0], p[1], diff)
+        diffs.append(diff)
 
 
     indent = " " * 4
@@ -77,27 +87,32 @@ def adams_method(f, x0, y0, xn, n):
     + indent + "  d4h  " + indent + "|"
     print "-" * 112
 
-    for p in ps4:
-        line = list(p) + diffs
-        for diff in line:
-            stdout.write("  {:+.8f}  |".format(float(diff)))
+    for (p,diff)  in zip(ps4, diffs):
+        line = list(p) + diff
+        for diffi in line:
+            stdout.write("  {:+.8f}  |".format(float(diffi)))
         stdout.write(os.linesep)
-        gen.next()
-        diffs = gen.send(p[1])
-        idiff = diffs
 
     ps = ps4
     xi = ps4[4][0]
     yi = ps4[4][1]
-    for none in gen:
+    idiff = diffs[4]
+    for i in range(5, 11):
         xi += h
         if xi > xn:
             break
+
         yi = yi + idiff[0] + Rational(1, 2) * idiff[1] + Rational(5, 12) * idiff[2] + \
             Rational(3, 8) * idiff[3] + Rational(251, 720) * idiff[4]
+
+        #print "y{i} = {yi:+.6f} + {diff0:+.6f} + 1/2 * {diff1:+.6f} + 5/12 * {diff2:+.6f} + 3/8 * {diff3:+.6f} + 251/720 * {diff4:+.6f}".format(
+        #    i=i, yi=yi, diff0=idiff[0], diff1=idiff[1], diff2=idiff[2], diff3=idiff[3], diff4=idiff[4]
+        #)
+        #i += 1
+
         ps.append((xi, yi))
 
-        idiff = gen.send(yi)
+        idiff = differences(f, h, xi, yi, idiff)
         line = [xi, yi] + idiff
         for (k, diff) in zip(range(0, 7), line):
             stdout.write("  {:+.8f}  |".format(float(diff)))
@@ -147,7 +162,7 @@ def print_table(points, y_pr, err):
 
 if __name__ == "__main__":
 
-    f = f.subs([(a, 1), (b, 10)])
+    f = f.subs([(a, 1), (b, 1)])
 
     x0 = 0
     y0 = 0
