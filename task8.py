@@ -36,8 +36,9 @@ def check_solution(a, x):
     b = a[:, ncol - 1]
     a = a[:, 0:ncol - 1]
     ax = a * x
+    eps = 10e-5
     for (axi, bi) in zip(ax, b):
-        if axi != bi:
+        if abs(axi - bi) > eps:
             return False
     return True
 
@@ -53,7 +54,11 @@ def calc_sum(a):
 
 if __name__ == "__main__":
 
-    a = Matrix([[2, 2, 4, 0], [5, 2, 9, -2], [3, 12, 0, -1]])
+    a = Matrix([[3.15, -1.18, 2.04, 0, 1.32, -5.18],
+                [0, 2.14, 1.71, 0, -2.01, -6.37],
+                [-1.11, 0, -3.16, 3.16, 1.14, 12.87],
+                [0, 0, 2.73, 4.20, 1.50, 1.74],
+                [0, 0, 0, 2.43, 4.51, 11.45]])
 
     a_orig = a
 
