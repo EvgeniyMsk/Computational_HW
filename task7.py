@@ -9,7 +9,8 @@ y = Symbol('y')
 a = Symbol('a')
 b = Symbol('b')
 
-f = (a*y**2 + x**2 + 2)/(b*y + x + 4)
+# f = (a*y**2 + x**2 + 2)/(b*y + x + 4)
+f = -y * (1+x)
 
 def f_range(a, b, d):
     while a < b:
@@ -59,6 +60,12 @@ def runge_kutt_method(f, x0, y0, xn, n):
         k2 = h*f.subs([(x, xk + h/2), (y, yk + k1/2)])
         k3 = h*f.subs([(x, xk + h/2), (y, yk + k2/2)])
         k4 = h*f.subs([(x, xk + h), (y, yk + k3)])
+
+        print "{:+.8f}".format(float(k1))
+        print "{:+.8f}".format(float(k2))
+        print "{:+.8f}".format(float(k3))
+        print "{:+.8f}".format(float(k4))
+        print ""
 
         yk_1 = yk + Rational(1, 6) * (k1 + 2*k2 + 2*k3 + k4)
         ps.append((xk + h, yk_1))
@@ -162,10 +169,10 @@ def print_table(points, y_pr, err):
 
 if __name__ == "__main__":
 
-    f = f.subs([(a, 1), (b, 1)])
+    # f = f.subs([(a, 1), (b, 1)])
 
     x0 = 0
-    y0 = 0
+    y0 = 1
     xn = 1
     n = 10
 

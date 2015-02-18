@@ -62,11 +62,13 @@ def quadrature(f, wf, nodes, a, b):
     wdiff = w.diff(x)
 
     quad = 0
+    AS = []
     for i in range(0, n):
         A = integrate(expand(wf * (1/wdiff.subs(x, nodes[i])) * (w/(x-nodes[i]))), (x, a, b))
+        AS.append(A)
         quad += A * f.subs(x, nodes[i])
 
-    return quad
+    return quad, AS
 
 
 
@@ -82,9 +84,18 @@ if __name__ == "__main__":
 
     nodes_4 = [0.3740045831816439, 0.02007727271691400, 0.4158706000599734, 0.13602909871867552]
 
-    quad2 = quadrature(f, p, list(nodes_2), a, b)
-    quad4 = quadrature(f, p, nodes_4, a, b)
+    quad2, A1 = quadrature(f, p, list(nodes_2), a, b)
+    quad4, A2 = quadrature(f, p, nodes_4, a, b)
 
     print "Integral of {}dx from 0 to 1/2".format(str(f*p))
+    print ""
+
     print "Gauss Quadrature with 2 nodes = {:+.8f}".format(float(quad2))
+    for (node, A) in zip(nodes_2, A1):
+        print "xk = {:+.8f} | Ak = {:+.8f}".format(node, A)
+
+    print ""
+
     print "Gauss Quadrature with 4 nodes = {:+.8f}".format(float(quad4))
+    for (node, A) in zip(nodes_4, A2):
+        print "xk = {:+.8f} | Ak = {:+.8f}".format(node, A)

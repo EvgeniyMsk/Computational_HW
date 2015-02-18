@@ -189,6 +189,9 @@ if __name__ == "__main__":
     intrpr4 = intrp3
     p_t = ((y - intrpr4) / y1 + t).subs(sub4)
 
+    p_t_diff = p_t.diff(t)
+    plot(p_t_diff, (t, -1, 1), ylim=(-2, 2))
+
     tk   = 0
     tk_1 = 0
     eps = 1e-5
