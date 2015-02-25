@@ -19,15 +19,27 @@ def gauss_direct(a):
     for k in range(0, a.shape[0]):
         gauss_step(a, k)
 
-def gauss_reverse(a):
+def gauss_reverse(a, direct=True):
     nrow = a.shape[0]
     ncol = a.shape[1]
     b = a[:, ncol - 1]
     x = zeros(nrow, 1)
-    for k in range(nrow - 1, -1, -1):
-        x[k] = b[k]
-        for j in range(k + 1, nrow):
-            x[k] -= x[j] * a[k, j]
+    if direct:
+
+        for k in range(nrow - 1, -1, -1):
+            x[k] = b[k]
+            for j in range(k + 1, nrow):
+                x[k] -= x[j] * a[k, j]
+            x[k] /= a[k, k]
+
+    else:
+
+        for k in range(0, nrow):
+            x[k] = b[k]
+            for j in range(k-1, -1, -1):
+                x[k] -= x[j] * a[k, j]
+            x[k] /= a[k, k]
+
     return x
 
 def check_solution(a, x):
