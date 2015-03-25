@@ -22,7 +22,7 @@ def get_nekrasov_approx(alpha, beta, x):
     n = x.shape[0]
     xk = zeros(n)
     for i in range(0, n):
-        for j in range(0, i-1):
+        for j in range(0, i):
             xk[i] += alpha[i, j] * xk[j]
         for j in range(i+1, n):
             xk[i] += alpha[i,j]  * x[j]
@@ -51,7 +51,7 @@ def iteration_method(a, b, eps, cb_approx, cb_print):
     cb_print(0, xk)
     cb_print(1, xk_1)
 
-    iter = 1
+    iter = 2
     diff = [sys.float_info.max]
     while max(diff) > eps and iter < 20:
         xk = xk_1
@@ -67,17 +67,24 @@ if __name__ == "__main__":
                 [0, 1, 0.2],
                 [0.1, 0.1, 1]])
 
-    b = Matrix([[1, 1.2, 1.2]])
-    b = b.T
+    a = Matrix([[786.33663, 0.94384311, -2.4277076],
+               [0.94384311, 597.1288, 0.56484802] ,
+               [-2.4277076, 0.56484802, 473.80154]])
 
-    system = a.col_insert(3, b)
+    b  = Matrix([[-3.242040, -6.179480, 3.631583]])
+    b1 = Matrix([[-0.13074427, -0.9304191, 1.0656642]])
+
+    b = b.T
+    b1 = b1.T
+
+    system = a.col_insert(3, b1)
 
     pprint(solve_linear_system(system, x1, x2, x3))
     print ' '
 
     print " Simple approximation: \n"
-    iteration_method(a, b, 1e-5, get_simple_approx, print_iter)
+    iteration_method(a, b1, 1e-8, get_simple_approx, print_iter)
     print "\n Nekrasov approximation: \n"
-    iteration_method(a, b, 1e-5, get_nekrasov_approx, print_iter)
+    iteration_method(a, b1, 1e-8, get_nekrasov_approx, print_iter)
 
     pass
