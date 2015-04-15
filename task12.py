@@ -4,6 +4,18 @@ from sympy.mpmath import e
 
 x = Symbol('x')
 
+def test_model(xs, yx, us, vs, kappa, nu):
+
+    space = ' '*5
+    print space + ' x ' + space + "|" + space + 'y(x)' + space + "|" + space + 'y(u, v)' + space
+    for (i, u, v) in zip(range(0, len(xs)), us, vs):
+        yi  = yx.subs(x, xs[i])
+        yi_ = u * yx.subs(x, xs[i+1]) + v
+        print "{:+12.8f} | {:+12.8f} | {:+12.8f}".format(xs[i], float(yi), float(yi_))
+    yn  = yx.subs(x, xs[-1])
+    yn_ = kappa * yx.subs(x, xs[-2]) + nu
+    print "{:+12.8f} | {:+12.8f} | {:+12.8f}".format(xs[-1], float(yn), float(yn_))
+
 if __name__ == "__main__":
 
     # solve differential equasition:
@@ -44,8 +56,8 @@ if __name__ == "__main__":
     kappa1 = ((b - 4*a) / (c - 2 * a * h * alpha - 3 * a)).subs(x, xs[1])
     nu1    = (g / (c - 2 * a * h * alpha - 3 * a)).subs(x, xs[1])
 
-    kappa2 = ((4*c - b) / (3 * c + 2 * c * h * beta - a)).subs(x, xs[n-1])
-    nu2    = (-g / (3 * c + 2 * c * h * beta - a)).subs(x, xs[n-1])
+    kappa2 = ((4*c - b) / (3 * c - 2 * c * h * beta - a)).subs(x, xs[n-1])
+    nu2    = (-g / (3 * c - 2 * c * h * beta - a)).subs(x, xs[n-1])
 
     us = [0] * (n)
     vs = [0] * (n)
@@ -55,14 +67,16 @@ if __name__ == "__main__":
         us[i] = (a / (b - c * us[i-1])).subs(x, xs[i])
         vs[i] = ((c * vs[i-1] - g) / (b - c * us[i-1])).subs(x, xs[i])
 
+    #test_model(xs, yx, us, vs, kappa2, nu2)
+
     ys = [0] * (n+1)
     ys[n] = float((nu2 + kappa2 * vs[n-1]) / (1 - kappa2 * us[n-1]))
 
     for i in range(n-1, -1, -1):
         ys[i] = solve(ysym[i] - us[i] * ys[i+1] - vs[i], ysym[i])[0]
 
-    space = ' '*6
-    print space + 'x' + space + "| " + space + 'y' + space
+    space = ' '*4
+    print space + ' x' + space + "|" + space + '  y'
     print '-' * 40
     for (xi, yi) in zip(xs, ys):
-        print "{:+12.8f} | {:+12.8f}".format(xi, yi)
+        print " {:+6.5f} | {:+12.8f}".format(xi, yi)
