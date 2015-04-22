@@ -4,17 +4,19 @@ from sympy.mpmath import e
 
 x = Symbol('x')
 
-def test_model(xs, yx, us, vs, kappa, nu):
+def test_model(xs, us, vs, kappa, nu):
 
     space = ' '*5
-    print space + ' x ' + space + "|" + space + 'y(x)' + space + "|" + space + 'y(u, v)' + space
+    print space + ' u ' + space + "|" + space + 'v' #+ space + "|" + space + 'y(u, v)' + space
     for (i, u, v) in zip(range(0, len(xs)), us, vs):
-        yi  = yx.subs(x, xs[i])
-        yi_ = u * yx.subs(x, xs[i+1]) + v
-        print "{:+12.8f} | {:+12.8f} | {:+12.8f}".format(xs[i], float(yi), float(yi_))
-    yn  = yx.subs(x, xs[-1])
-    yn_ = kappa * yx.subs(x, xs[-2]) + nu
-    print "{:+12.8f} | {:+12.8f} | {:+12.8f}".format(xs[-1], float(yn), float(yn_))
+        #yi  = yx.subs(x, xs[i])
+        #yi_ = u * yx.subs(x, xs[i+1]) + v
+        print "{:3} | {:+12.8f} | {:+12.8f}".format(i, float(u), float(v))
+
+    print "{:3} | {:+12.8f} | {:+12.8f}".format(i, float(u), float(v))
+    #yn  = yx.subs(x, xs[-1])
+    #yn_ = kappa * yx.subs(x, xs[-2]) + nu
+    #print "{:+12.8f} | {:+12.8f} | {:+12.8f}".format(xs[-1], float(yn), float(yn_))
 
 if __name__ == "__main__":
 
@@ -41,12 +43,12 @@ if __name__ == "__main__":
     fx = 1 / (1 + x)
 
     # model solution, for debugging
-    #yx   = sin(x) + 1
-    #dyx  = diff(yx, x)
-    #d2yx = diff(yx, x, 2)
-    #alpha = (dyx / yx).subs(x, 0)
-    #beta  = (dyx / yx).subs(x, 1)
-    #fx   = d2yx + px * dyx + qx * yx
+    yx   = sin(x) + 1
+    dyx  = diff(yx, x)
+    d2yx = diff(yx, x, 2)
+    alpha = (dyx / yx).subs(x, 0)
+    beta  = (dyx / yx).subs(x, 1)
+    fx   = d2yx + px * dyx + qx * yx
 
     a = 1 + px * h/2
     b = 2 - qx * h**2
@@ -67,7 +69,7 @@ if __name__ == "__main__":
         us[i] = (a / (b - c * us[i-1])).subs(x, xs[i])
         vs[i] = ((c * vs[i-1] - g) / (b - c * us[i-1])).subs(x, xs[i])
 
-    #test_model(xs, yx, us, vs, kappa2, nu2)
+    test_model(xs, us, vs, kappa2, nu2)
 
     ys = [0] * (n+1)
     ys[n] = float((nu2 + kappa2 * vs[n-1]) / (1 - kappa2 * us[n-1]))
@@ -76,7 +78,7 @@ if __name__ == "__main__":
         ys[i] = solve(ysym[i] - us[i] * ys[i+1] - vs[i], ysym[i])[0]
 
     space = ' '*4
-    print space + ' x' + space + "|" + space + '  y'
+    print space + ' x' + space + "|" + space + '  y' + space + "|" + space + 'y`'
     print '-' * 40
     for (xi, yi) in zip(xs, ys):
         print " {:+6.5f} | {:+12.8f}".format(xi, yi)
